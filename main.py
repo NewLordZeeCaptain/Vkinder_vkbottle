@@ -1,22 +1,26 @@
 from pprint import pprint
 from db.database import *
 from keyboard import keyboard
-from vkbottle.bot import Bot, Message
+from vkbottle.bot import Bot, Message, MessageEvent
 from config.config import GROUP_TOKEN, USER_TOKEN
+
 from peewee import IntegrityError
 from user_func import *
+import asyncio
 
 # GROUP_TOKEN = "vk1.a.7Dxz8HAcsfw8b_qGxDRcEyudtNs9qQp3tYtPxP69Xklhm1vGuVkHk_2ZxARrrNruClP0YFqe41KygfmoTcS-U1fql77I5TIp-cp0Fyuy2Hykf122frZrGEyPv_xocFHubAAPzdxQdgcRpUJpFTqqn21RtqRS_AB52DyZRlOk5HnzL4Fwn3VZJGl5a_i1JA2IjiQu6PhfPmvV7s1l8b5Heg"
 # token = SingleTokenGenerator(token=GROUP_TOKEN)
 
 
 bot = Bot(token=GROUP_TOKEN)
+lock = asyncio.Lock()
 
 
-@bot.on.message(payload="/search")
 @bot.on.message(text="Начать")
 async def begin(message: Message):
     user_info = await get_user_info(message.from_id)
+
+    await message.answer(f"{user_info, user_info.city}")
 
     try:
         status = reg_user(
@@ -24,11 +28,13 @@ async def begin(message: Message):
             first_name=user_info.first_name,
             last_name=user_info.last_name,
             sex=user_info.sex,
+            city=user_info.city.id if user_info.city else 1,
         )
         await message.answer(
             f"Добро пожаловать, {user_info.first_name}. Этот бот заменит вам Tinder",
             keyboard=keyboard,
         )
+        return True
     except IntegrityError:
         await message.answer(
             f"С возвращением, {user_info.first_name}!", keyboard=keyboard
@@ -39,15 +45,24 @@ async def begin(message: Message):
 async def get_info_from_db(message: Message):
     info = get_user_info_db(message.from_id)
     await message.answer(
-        f"Info is type of {type(info), info.first_name, info.last_name}"
+        f"Info is type of {type(info), info.first_name, info.last_name, info.sex, info.city, info.vk_id}"
     )
 
     # await message.answer(f"Your info: {info} ")
 
 
+offset = 0
+
+
 @bot.on.message(text="Поиск")
 async def show_next(message: Message):
-    pass
+    city = get_user_info_db(message.from_id).city
+    user = await search_user(city=city, offset=offset)
+    
+    photos = await get_photos(user.id)
+    await message.answer(
+        f"Here is your candidate: {'https://vk.com/id'+str(user.id)}", attachment=photos
+    )
 
 
 @bot.on.message(text="В избранные")
@@ -72,11 +87,18 @@ async def show_black(message: Message):
 
 @bot.on.message(text="photo")
 async def get_photo(message: Message):
-    # try:
-    photo = await get_photos(message.from_id)
-    await message.answer(
-        "Here is some of your photos", keyboard=keyboard, attachment=photo
-    )
+    try:
+        photo = await get_photos(message.from_id)
+        if photo is None:
+            await message.answer("I can't access your photo")
+        else:
+            link_list = [link for _, link in photo]
+
+            await message.answer(
+                "Here are some of your photos", keyboard=keyboard, attachment=link_list
+            )
+    except Exception as e:
+        await message.answer(f"An error occurred while fetching photos {e}")
     # except Exception as e:
 
     #     await message.answer("Failed to retrieve photos. Please try again later. With Exception", e)

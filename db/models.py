@@ -17,6 +17,7 @@ class User(BaseModel):
     first_name = TextField()
     last_name = TextField()
     sex = IntegerField()
+    city = IntegerField()
 
     
 class Favorite(BaseModel):
