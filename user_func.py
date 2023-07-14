@@ -1,5 +1,6 @@
 from config.config import USER_TOKEN
 from vkbottle import API
+import datetime
 
 api = API(USER_TOKEN)
 
@@ -33,18 +34,31 @@ async def get_photos(user_id):
         for photo in user_photos
         if photo[0] not in ["нет фото."] and photo[1] != "нет доступа к фото"
     ]
-    photo= sorted(result, reverse=True)
+    photo = sorted(result, reverse=True)
     link_list = [link for _, link in photo]
-    return link_list
+    return link_list[0:3]
 
 
-async def search_user(city, sex=0, age_from=18, age_to=100):
-    offset = 0
-    total_users = []
+async def search_user(user, offset):
+    if user.age is None:
+        age_from = 16
+        age_to = 100
+    else:
+        age_from = user.age - 5
+        age_to = user.age + 5
+
+    match user.sex:
+        case 1:
+            sex = 2
+        case 2:
+            sex = 1
+        case _:
+            sex = 0
+
     users = await api.users.search(
-        city=city, age_from=age_from, age_to=age_to, sex=sex, had_photo=1, offset=offset
+        age_from=age_from, age_to=age_to, sex=sex, had_photo=1, offset=offset, status=1
     )
-    return users.items[0]
+    return (users.items[0], offset + 1)
 
 
 async def get_city_id(city_name: str) -> int:
@@ -53,6 +67,16 @@ async def get_city_id(city_name: str) -> int:
 
 
 async def get_user_info(user_id):
-    fields = ["first_name", "last_name", "id", "sex", "city"]
+    fields = ["first_name", "last_name", "id", "sex", "city", "bdate"]
     data = await api.users.get(user_id, fields=fields)
     return data[0]
+
+
+def age_to_int(bdate):
+    if bdate == None:
+        return None
+    today = datetime.date.today()
+
+    born = datetime.datetime.strptime(bdate, "%d.%m.%Y")
+
+    return today.year - born.year - ((today.month, today.day) < (born.month, born.day))
