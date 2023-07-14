@@ -16,8 +16,6 @@ bot = Bot(token=GROUP_TOKEN)
 ctx_storage = CtxStorage()
 
 
-
-
 @bot.on.message(text="Начать")
 async def begin(message: Message):
     user_info = await get_user_info(message.from_id)
@@ -55,11 +53,11 @@ async def begin(message: Message):
 
 @bot.on.message(text="Поиск")
 async def show_next(message: Message):
-    city = get_user_info_db(message.from_id).city
-    offset = ctx_storage.get(f"offset_{message.from_id}")
     user = get_user_info_db(message.from_id)
-    candidate, offset = await search_user(user=user, offset=offset)
-
+    offset = ctx_storage.get(f"offset_{message.from_id}")
+    candidate = None
+    while candidate is None or candidate.is_closed:
+        candidate, offset = await search_user(user=user, offset=offset)
     photos = await get_photos(candidate.id)
     ctx_storage.set(f"offset_{message.from_id}", offset)
     await message.answer(
