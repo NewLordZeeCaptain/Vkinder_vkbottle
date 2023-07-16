@@ -16,10 +16,11 @@ bot = Bot(token=GROUP_TOKEN)
 ctx_storage = CtxStorage()
 
 
+
 @bot.on.message(text="Начать")
 async def begin(message: Message):
     user_info = await get_user_info(message.from_id)
-
+    
     try:
         status = reg_user(
             vk_id=user_info.id,
@@ -61,7 +62,7 @@ async def show_next(message: Message):
     photos = await get_photos(candidate.id)
     ctx_storage.set(f"offset_{message.from_id}", offset)
     await message.answer(
-        f"Here is your candidate: Firstname: {candidate.first_name} Lustname: {candidate.last_name} URL: {'https://vk.com/id'+str(candidate.id)}",
+        f"Here is your candidate: {'https://vk.com/id'+str(candidate.id)}",
         attachment=photos,
         keyboard=keyboard,
     )

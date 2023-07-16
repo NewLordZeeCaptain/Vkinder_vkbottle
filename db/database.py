@@ -42,19 +42,20 @@ def add_to_favorite(
     user_id: int, vk_id: int, first_name: str, last_name: str, city: int, photos: str
 ):
     fav = Favorite.create(
+        user_id=user_id,
         vk_id=vk_id,
         first_name=first_name,
         last_name=last_name,
         city=city,
         photos=photos,
-    ).where(User.vk_id == user_id)
+    )
     return fav
 
 
 def add_to_blacklist(user_id: int, vk_id: int, first_name: str, last_name: str):
     black = Blacklist.create(
-        vk_id=vk_id, first_name=first_name, last_name=last_name
-    ).where(User.vk_id == user_id)
+        user_id=user_id, vk_id=vk_id, first_name=first_name, last_name=last_name
+    )
     return black
 
 
