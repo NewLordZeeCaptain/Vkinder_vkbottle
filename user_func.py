@@ -56,18 +56,25 @@ async def search_user(user, offset):
             sex = 0
 
     users = await api.users.search(
-        age_from=age_from, age_to=age_to, sex=sex, had_photo=1, offset=offset, status=1
+        age_from=age_from,
+        age_to=age_to,
+        sex=sex,
+        had_photo=1,
+        offset=offset,
+        status=1,
     )
+    
     return (users.items[0], offset + 1)
 
 
 async def get_city_id(city_name: str) -> int:
     city = await api.database.get_cities(country_id=1, q=city_name)
-    return city.items.id if city.items else None
+
+    return city.items[0].id if city.items else None
 
 
 async def get_user_info(user_id):
-    fields = ["first_name", "last_name", "id", "sex", "city", "bdate"]
+    fields = ["first_name", "last_name", "id", "sex", "city", "bdate","status"]
     data = await api.users.get(user_id, fields=fields)
     return data[0]
 
