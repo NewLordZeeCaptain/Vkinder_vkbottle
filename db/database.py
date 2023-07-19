@@ -69,6 +69,7 @@ def reg_user(
     age: int,
     status: int,
 ):
+    
     user = User.create(
         user_id=user_id,
         first_name=first_name,
@@ -82,41 +83,13 @@ def reg_user(
 
 
 def get_user_info_db(user_id):
-    return User.select().where(User.user_id == user_id).get()
+    try:
+        return User.select().where(User.user_id == user_id).get()
+    except DoesNotExist:
+        return DoesNotExist
 
 
-def get_fav(user_id: int):
-    return Favorite.select().join(User).where(User.vk_id == user_id).get()
 
 
-def get_black(user_id: int):
-    return Blacklist.select().join(User).where(User.vk_id == user_id).get()
 
 
-def add_to_favorite(
-    user_id: int, vk_id: int, first_name: str, last_name: str, city: int, photos: str
-):
-    fav = Favorite.create(
-        user_id=user_id,
-        vk_id=vk_id,
-        first_name=first_name,
-        last_name=last_name,
-        city=city,
-        photos=photos,
-    )
-    return fav
-
-
-def add_to_blacklist(user_id: int, vk_id: int, first_name: str, last_name: str):
-    black = Blacklist.create(
-        user_id=user_id, vk_id=vk_id, first_name=first_name, last_name=last_name
-    )
-    return black
-
-
-def remove_from_fav(user_id: int, vk_id: int):
-    return Favorite.delete(vk_id=vk_id).where(User.vk_id == user_id)
-
-
-def remove_from_black(user_id: int, vk_id: int):
-    return Blacklist.delete(vk_id=vk_id).where(User.vk_id == user_id)

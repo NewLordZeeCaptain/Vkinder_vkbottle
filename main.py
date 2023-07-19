@@ -117,7 +117,11 @@ questions = {
 
 @bot.on.message(text="Поиск")
 async def show_next(message: Message):
-    user = get_user_info_db(message.from_id)
+    try:
+        user = get_user_info_db(message.from_id)
+    except:
+        await message.answer("Такого пользователя не существует. Напишите \"Начать\" Чтобы зарегистрироватся вновь")
+        return False
     offset = ctx_storage.get(f"offset_{message.from_id}")
     candidate = None
     while candidate is None or candidate.is_closed:

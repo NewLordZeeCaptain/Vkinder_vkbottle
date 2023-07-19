@@ -1,5 +1,5 @@
 
-from peewee import Model, ForeignKeyField, IntegerField, TextField, PostgresqlDatabase
+from peewee import Model, ForeignKeyField, IntegerField, TextField, PostgresqlDatabase, DoesNotExist
 
 
 db = PostgresqlDatabase(
