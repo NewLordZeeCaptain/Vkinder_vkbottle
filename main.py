@@ -8,9 +8,6 @@ from config.config import GROUP_TOKEN, USER_TOKEN
 from peewee import IntegrityError
 from user_func import *
 
-# GROUP_TOKEN = "vk1.a.7Dxz8HAcsfw8b_qGxDRcEyudtNs9qQp3tYtPxP69Xklhm1vGuVkHk_2ZxARrrNruClP0YFqe41KygfmoTcS-U1fql77I5TIp-cp0Fyuy2Hykf122frZrGEyPv_xocFHubAAPzdxQdgcRpUJpFTqqn21RtqRS_AB52DyZRlOk5HnzL4Fwn3VZJGl5a_i1JA2IjiQu6PhfPmvV7s1l8b5Heg"
-# token = SingleTokenGenerator(token=GROUP_TOKEN)
-
 
 bot = Bot(token=GROUP_TOKEN)
 ctx_storage = CtxStorage()

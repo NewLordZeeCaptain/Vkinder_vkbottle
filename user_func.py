@@ -10,8 +10,7 @@ async def get_photos(user_id):
         photos = await api.photos.get(
             owner_id=user_id, album_id="profile", count=10, extended=1, photo_sizes=1
         )
-        # print(photos.count, photos.items[0].likes)
-        # photo_items = photos.items
+
         photo_items = photos.items
 
     except Exception as e:

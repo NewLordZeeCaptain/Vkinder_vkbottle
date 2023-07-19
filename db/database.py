@@ -1,15 +1,11 @@
-# from configs.config import CONSTR
+
 from db.models import *
 
 # Connecting DB
 db.connect()
 db.drop_tables([User, Favorite, Blacklist, Candidate])
 db.create_tables([User, Favorite, Blacklist, Candidate])
-# Check if tables exist before dropping and recreating them
 
-
-# def reg_user(user_id: int):
-#     return User.create(vk_id=user_id)
 
 
 def update_city(user_id, city):
