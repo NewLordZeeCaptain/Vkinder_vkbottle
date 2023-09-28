@@ -3,7 +3,7 @@ from peewee import Model, ForeignKeyField, IntegerField, TextField, PostgresqlDa
 
 
 db = PostgresqlDatabase(
-    "postgres", user="postgres", host="92.51.36.19", password="postgres"
+    "postgres", user="postgres", host="192.168.31.112", password="postgres"
 )
 
 
