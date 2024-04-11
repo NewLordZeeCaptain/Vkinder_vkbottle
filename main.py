@@ -1,12 +1,26 @@
-from pprint import pprint
-from db.database import *
+from db.database import (
+    update_city,
+    update_age,
+    update_status,
+    get_user_info_db,
+    reg_user,
+    add_to_blacklist,
+    add_to_favorite,
+)
 from keyboard import keyboard
 from vkbottle import CtxStorage
-from vkbottle.bot import Bot, Message, MessageEvent
-from config.config import GROUP_TOKEN, USER_TOKEN
+from vkbottle.bot import Bot, Message
+from config.config import GROUP_TOKEN
 
 from peewee import IntegrityError
-from user_func import *
+from user_func import (
+    get_photos,
+    get_city_id,
+    get_user_info,
+    age_to_int,
+    api,
+    search_user,
+)
 
 
 bot = Bot(token=GROUP_TOKEN)
@@ -60,7 +74,6 @@ async def handle_bdate(message: Message):
     await message.answer(f"Age is set to {age}", keyboard=keyboard)
 
 
-
 @bot.on.message(
     func=lambda message: ctx_storage.get(f"awaiting_status_{message.from_id}")
 )
@@ -73,11 +86,10 @@ async def handle_status(message: Message):
         await message.answer("Это должно быть число")
         return
     if 0 > status > 7:
-        await message.answer(f"Такого статуса нет")
+        await message.answer("Такого статуса нет")
         return
     update_status(user_id, status)
     await message.answer(f"Status is set to {status}", keyboard=keyboard)
-
 
 
 @bot.on.message(
@@ -88,12 +100,11 @@ async def handle_city(message: Message):
     user_id = message.from_id
     city_id = await get_city_id(city)
 
-    if city_id == None:
-        await message.answer(f"Такого города нет")
+    if city_id is None:
+        await message.answer("Такого города нет")
         return
     update_city(user_id, city_id)
     await message.answer(f"City is set to {city}", keyboard=keyboard)
-
 
 
 questions = {
@@ -120,7 +131,9 @@ async def show_next(message: Message):
     try:
         user = get_user_info_db(message.from_id)
     except:
-        await message.answer("Такого пользователя не существует. Напишите \"Начать\" Чтобы зарегистрироватся вновь")
+        await message.answer(
+            'Такого пользователя не существует. Напишите "Начать" Чтобы зарегистрироватся вновь'
+        )
         return False
     offset = ctx_storage.get(f"offset_{message.from_id}")
     candidate = None
@@ -169,6 +182,7 @@ async def show_fav(message: Message):
 async def show_black(message: Message):
     pass
 
+
 @bot.on.message()
 async def handle_question(message: Message):
     user_id = message.from_id
@@ -184,7 +198,8 @@ async def handle_question(message: Message):
         ctx_storage.set(f"awaiting_{user_id}", next_question_key)
     else:
         ctx_storage.delete(f"awaiting_{user_id}")
-        
+
+
 @bot.on.message()
 async def echo_handler(message: Message):
     users_info = await api.users.get(

@@ -1,5 +1,4 @@
-
-from peewee import Model, ForeignKeyField, IntegerField, TextField, PostgresqlDatabase, DoesNotExist
+from peewee import Model, ForeignKeyField, IntegerField, TextField, PostgresqlDatabase
 
 
 db = PostgresqlDatabase(
@@ -11,7 +10,6 @@ class BaseModel(Model):
     class Meta:
         # database = sqlitedb
         database = db
-        
 
 
 class User(BaseModel):
@@ -25,7 +23,11 @@ class User(BaseModel):
 
 
 class Candidate(BaseModel):
-    user = ForeignKeyField(User, backref="candidates", on_delete="CASCADE",)
+    user = ForeignKeyField(
+        User,
+        backref="candidates",
+        on_delete="CASCADE",
+    )
     vk_id = IntegerField(unique=True)
     first_name = TextField()
     last_name = TextField()
@@ -45,5 +47,3 @@ class Blacklist(BaseModel):
     vk_id = IntegerField(unique=True)
     first_name = TextField()
     last_name = TextField()
-
-

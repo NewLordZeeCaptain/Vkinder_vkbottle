@@ -1,11 +1,10 @@
-
-from db.models import *
+from db.models import User, Candidate, Blacklist, Favorite, db
+from peewee import fn, DoesNotExist
 
 # Connecting DB
 db.connect()
 db.drop_tables([User, Favorite, Blacklist, Candidate])
 db.create_tables([User, Favorite, Blacklist, Candidate])
-
 
 
 def update_city(user_id, city):
@@ -49,7 +48,7 @@ def create_candidate_list(user_id: int, candidate_list: list):
 def get_candidate(user_id):
     max_vk_id = (
         Candidate.select(fn.MAX(Candidate.vk_id))
-        .where(Candidate.user_id == user_id)
+        .where(Candidate.user == user_id)
         .scalar()
     )
     next_vk_id = max_vk_id + 1 if max_vk_id is not None else 1
@@ -57,7 +56,26 @@ def get_candidate(user_id):
 
 
 def clear_candidate_list(user_id):
-    Candidate.delete().where(Candidate.user_id == user_id)
+    Candidate.delete().where(Candidate.user == user_id)
+
+
+def add_to_blacklist(user_id, vk_id, first_name, last_name):
+    blacklist = Blacklist(
+        user=user_id, first_name=first_name, last_name=last_name, vk_id=vk_id
+    )
+    return blacklist
+
+
+def add_to_favorite(user_id, vk_id, first_name, last_name, photos, city):
+    favorite = Favorite(
+        user=user_id,
+        vk_id=vk_id,
+        first_name=first_name,
+        last_name=last_name,
+        photos=photos,
+        city=city,
+    )
+    return favorite
 
 
 def reg_user(
@@ -69,7 +87,6 @@ def reg_user(
     age: int,
     status: int,
 ):
-    
     user = User.create(
         user_id=user_id,
         first_name=first_name,
@@ -87,9 +104,3 @@ def get_user_info_db(user_id):
         return User.select().where(User.user_id == user_id).get()
     except DoesNotExist:
         return DoesNotExist
-
-
-
-
-
-
