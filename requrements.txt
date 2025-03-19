@@ -13,7 +13,7 @@ idna==3.4
 multidict==6.0.4
 peewee==3.16.2
 peewee-async==0.8.1
-psycopg2-binary==2.9.6
+psycopg2-binary==2.9.10
 pydantic==1.10.9
 sniffio==1.3.0
 typing_extensions==4.6.3
